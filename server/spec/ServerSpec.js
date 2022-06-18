@@ -50,8 +50,10 @@ describe('Node Server Request Listener Function', function() {
     expect(res._responseCode).to.equal(201);
 
     // Testing for a newline isn't a valid test
-    // TODO: Replace with with a valid test
+    // TODO: Replace with a valid test
     // expect(res._data).to.equal(JSON.stringify('\n'));
+
+
     expect(res._ended).to.equal(true);
   });
 
@@ -89,6 +91,48 @@ describe('Node Server Request Listener Function', function() {
 
     expect(res._responseCode).to.equal(404);
     expect(res._ended).to.equal(true);
+  });
+
+  //New Tests
+  it('Should 404 when sent an invalid method', function() {
+    req = new stubs.request('/classes/messages', 'PATCH');
+    res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(404);
+    expect(res._ended).to.equal(true);
+  });
+
+  it('Should 200 when an OPTIONS request is made', function() {
+    req = new stubs.request('/classes/messages', 'OPTIONS');
+    res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(200);
+    expect(res._ended).to.equal(true);
+  });
+
+
+  it('Should return JSON parsable stringified objects', function() {
+    var stubMsg = {
+      username: 'Jono',
+      text: 'Do my bidding!'
+    };
+    var req = new stubs.request('/classes/messages', 'POST', stubMsg);
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    // Now if we request the log for that room the message we posted should be there:
+    req = new stubs.request('/classes/messages', 'GET');
+    res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    var messages = JSON.parse(res._data);
+    expect(typeof messages[0]).to.equal('object');
   });
 
 });

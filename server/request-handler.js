@@ -48,17 +48,26 @@ var requestHandler = function (request, response) {
 
   // The outgoing status.
   if (request.url === messagesAddress) {
-    console.log(messageData);
     if (request.method === 'GET') {
       response.writeHead(200, headers);
       response.end(JSON.stringify(messageData));
     } else if (request.method === 'POST') {
       response.writeHead(201, headers);
-      //messageData.push(request._postData);
+      var message = '';
+      request.on('data', chunk => {
+        message += chunk;
+      });
+      request.on('end', () => {
+        var messageObj = JSON.parse(message);
+        messageData.push(messageObj);
+      });
       response.end('MeSsAgE PoStEd');
     } else if (request.method === 'OPTIONS') {
       response.writeHead(200, headers);
       response.end('Options');
+    } else {
+      response.writeHead(404, headers);
+      response.end('Not a valid method');
     }
   } else {
     response.writeHead(404, headers);
