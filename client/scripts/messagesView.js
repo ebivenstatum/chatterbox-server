@@ -2,12 +2,12 @@ var MessagesView = {
 
   $chats: $('#chats'),
 
-  initialize: function() {
+  initialize: function () {
 
     MessagesView.$chats.on('click', '.username', MessagesView.handleClick);
-      },
+  },
 
-  render: function() {
+  render: function () {
 
     MessagesView.$chats.html('');
     Messages
@@ -16,17 +16,17 @@ var MessagesView = {
       .each(message => MessagesView.renderMessage(message));
   },
 
-  renderMessage: function(message) {
+  renderMessage: function (message) {
     var $message = MessageView.render(message);
     MessagesView.$chats.prepend($message);
   },
 
-  handleClick: function(event) {
+  handleClick: function (event) {
     // Get username from data attribute
     var username = $(event.target).data('username');
     if (username === undefined) { return; }
 
     Friends.toggleStatus(username, MessagesView.render);
-      }
+  }
 
 };
