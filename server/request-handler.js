@@ -1,3 +1,5 @@
+var _ = require('underscore');
+
 /*************************************************************
 
 You should implement your request handler function in this file.
@@ -13,6 +15,8 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 
 var messageData = [];
+
+var messageCount = 0;
 
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
@@ -59,9 +63,11 @@ var requestHandler = function (request, response) {
       });
       request.on('end', () => {
         var messageObj = JSON.parse(message);
+        _.extend(messageObj, {messageId: messageCount});
         messageData.push(messageObj);
+        messageCount++;
       });
-      response.end('MeSsAgE PoStEd');
+      response.end(/*'MeSsAgE PoStEd'*/ JSON.stringify(messageData));
     } else if (request.method === 'OPTIONS') {
       response.writeHead(200, headers);
       response.end('Options');
