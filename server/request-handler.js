@@ -1,5 +1,9 @@
 var _ = require('underscore');
+var fs = require('fs');
+//var messageCount = require('./messagesLog.js').messageCount;
 
+//console.log(messageCount)
+//import messageData from './messagesLog.js';
 /*************************************************************
 
 You should implement your request handler function in this file.
@@ -13,10 +17,9 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+var messageData = JSON.parse(fs.readFileSync('./server/messages.txt'));
 
-var messageData = [];
-
-var messageCount = 0;
+var messageCount = parseInt(fs.readFileSync('./server/messagesCount.txt'));
 
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
@@ -66,18 +69,21 @@ var requestHandler = function (request, response) {
         _.extend(messageObj, {messageId: messageCount});
         messageData.push(messageObj);
         messageCount++;
+        fs.writeFileSync('./server/messagesCount.txt', JSON.stringify(messageCount));
+        fs.writeFileSync('./server/messages.txt', JSON.stringify(messageData));
       });
-      response.end(/*'MeSsAgE PoStEd'*/ JSON.stringify(messageData));
+      response.end(JSON.stringify(messageData));
     } else if (request.method === 'OPTIONS') {
       response.writeHead(200, headers);
-      response.end('Options');
+      response.end('Allow: GET, POST, OPTIONS');
     } else {
       response.writeHead(404, headers);
       response.end('Not a valid method');
     }
   } else {
-    response.writeHead(404, headers);
-    response.end('404 Not Found');
+    response.statusCode = 301;
+    response.setHeader('Location', './chatterbox.html');
+    response.end();
   }
 
 
